@@ -1,0 +1,90 @@
+<html>
+<head>
+    <title>Socket.IO chat</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font: 18px Helvetica, Arial; }
+        form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%;}
+        form input { border: 0; padding: 10px; width: 85%; margin-right: .5%; }
+        form button { width: 14%; background: rgb(130, 224, 255); border: none; padding: 10px; }
+
+        li { width: 100%; display:inline-block; }
+        #messages { list-style-type: none; padding-bottom: 100px; }
+        .others { padding: 5px 5px; background: #e0e0e0; text-align: left; float:left; border-radius: 5px; margin-left: 20px; margin-top: 10px;}
+        .others-time { padding: 5px 10px; color: #adadad; text-align: left; float:left; border-radius: 5px; margin-left: 20px; margin-bottom: 5px; font: 10px Helvetica, Arial;}
+
+        .mine { padding: 5px 10px; background: #03cc00; text-align: right; float:right; border-radius: 5px; margin-right: 20px; margin-top: 10px; }
+        .mine-time { padding: 5px 10px; color: #adadad; text-align: right; float:right; border-radius: 5px; margin-right: 20px; margin-bottom: 5px; font: 10px Helvetica, Arial;}
+
+        #profile button { width: 100px; background: rgb(130, 224, 255); border-radius: 5px; border: none; padding: 10px; font: 18px Helvetica, Arial; }
+        #profile input { padding: 10px; width: 250px; margin-right: .5%; font: 18px Helvetica, Arial; }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css" />
+</head>
+<body>
+<ul id="messages"></ul>
+<form action="">
+    <input id="m" autocomplete="off" /><button>Send</button>
+</form>
+
+<div id="profile" class="modal">
+    <span>你是誰？</span>
+    <input id="username" autocomplete="off" />
+    <button>Send</button>
+</div>
+
+<script src="./socket.io-1.3.7.js"></script>
+<!-- Remember to include jQuery :) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0/jquery.min.js"></script>
+
+<!-- jQuery Modal -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
+<script>
+
+    $('#profile').modal('show');
+
+    var username = '';
+    var randomId = Math.floor((Math.random() * 1000) + 1);
+    $('#profile button').click(function() {
+        username = $('#username').val();
+        randomId = randomId + username;
+
+        $('#profile').hide();
+        $('.jquery-modal').hide();
+    });
+
+    var socket = io();
+
+    var nowMessage = '';
+    $('form').submit(function(){
+        var msgObj = {
+            "username": username,
+            "msg": $('#m').val(),
+            "uuid": randomId,
+        };
+        socket.emit('chat message', JSON.stringify(msgObj));
+        nowMessage = randomId;
+        $('#m').val('');
+        return false;
+    });
+    socket.on('chat message', function(msg){
+        var currentdate = new Date();
+        var time = currentdate.getHours() + ":" + ((currentdate.getMinutes() < 10)?"0":"") + currentdate.getMinutes();
+
+        var revObj = JSON.parse(msg);
+
+        if (nowMessage == revObj.uuid) {
+            // $('#messages').append($('<li>').text('<span class="mine">'+msg+'</span>'));
+            $('#messages').append('<li>').append($('<span class="mine">').text(revObj.msg));
+            $('#messages').append('<li>').append($('<span class="mine-time">').text(time));
+        } else {
+            $('#messages').append('<li>').append($('<span class="others">').text(revObj.msg));
+            $('#messages').append('<li>').append($('<span class="others-time">').text(time+"("+revObj.username+")"));
+        }
+
+        $('html,body').scrollTop(100000000000000000);
+        nowMessage = ''
+    });
+</script>
+</body>
+</html>

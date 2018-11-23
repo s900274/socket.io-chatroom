@@ -1,0 +1,6 @@
+github.com/gorilla/websocket v1.4.0 h1:WDFjx/TMzVgy9VdMMQi2K2Emtwi2QcUQsztZ/zLaH/Q=
+github.com/gorilla/websocket v1.4.0/go.mod h1:E7qHFY5m1UJ88s3WnNqhKjPHQ0heANvMoAMk2YaljkQ=
+github.com/nkovacs/go-engine.io v0.0.0-20160407125956-0322b59816cb h1:ONUQnhhZOuvnF6+ZU0f0u32s3/maeo/bfqfIRyPUkjE=
+github.com/nkovacs/go-engine.io v0.0.0-20160407125956-0322b59816cb/go.mod h1:QdxC3T6s/IcTB3v8bZ6tMhUBeWQrk0yQmq0+0eaBLJo=
+github.com/nkovacs/go-socket.io v0.0.0-20160407114850-e507d8cf976e h1:xz9suTUzNvjxjmqmnSsew8l8tCZI1xjMtp0OlPjyRDg=
+github.com/nkovacs/go-socket.io v0.0.0-20160407114850-e507d8cf976e/go.mod h1:pRQ190vXDS1OibmooW3ykMgdMZKsqHE0MlpCqFZ3v4A=
