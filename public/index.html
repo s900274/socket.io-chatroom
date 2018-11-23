@@ -62,6 +62,9 @@
             "msg": $('#m').val(),
             "uuid": randomId,
         };
+        if ($('#m').val() == '') {
+            return false;
+        }
         socket.emit('chat message', JSON.stringify(msgObj));
         nowMessage = randomId;
         $('#m').val('');
