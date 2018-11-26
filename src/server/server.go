@@ -15,6 +15,7 @@ func main() {
 	server.On("connection", func(so socketio.Socket) {
 		log.Println("on connection")
 		so.Join("chat")
+		//so.BroadcastTo("chat", "chat message", `{"username":"Test","msg":"111","uuid":"161Test"}`)
 		so.On("chat message", func(msg string) {
 			log.Println("chat message", msg)
 			log.Println("emit:", so.Emit("chat message", msg))
