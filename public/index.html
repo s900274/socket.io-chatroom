@@ -5,8 +5,9 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font: 18px Helvetica, Arial; }
         form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%;}
-        form input { border: 0; padding: 10px; width: 85%; margin-right: .5%; }
+        form input { border: 0; padding: 10px; width: 79%; margin-right: .5%; margin-left: .5%; }
         form button { width: 14%; background: rgb(130, 224, 255); border: none; padding: 10px; }
+        #leave-btn { width: 6%; background: rgb(130, 224, 255); border: none; padding: 10px; }
 
         li { width: 100%; display:inline-block; }
         #messages { list-style-type: none; padding-bottom: 100px; }
@@ -24,7 +25,7 @@
 <body>
 <ul id="messages"></ul>
 <form action="">
-    <input id="m" autocomplete="off" /><button>Send</button>
+    <button id="leave-btn">Leave</button><input id="m" autocomplete="off" /><button>Send</button>
 </form>
 
 <div id="profile" class="modal">
@@ -44,7 +45,8 @@
     $('#profile').modal('show');
 
     var username = '';
-    var randomId = Math.floor((Math.random() * 1000) + 1);
+    var roomId = '';
+    var randomId = "unique_user_id_"+username+"_"+Math.floor((Math.random() * 1000) + 1);
     $('#profile button').click(function() {
         username = $('#username').val();
         randomId = randomId + username;
@@ -61,6 +63,8 @@
             "username": username,
             "msg": $('#m').val(),
             "uuid": randomId,
+            "roomId": roomId,
+            "type": "message",
         };
         if ($('#m').val() == '') {
             return false;
@@ -70,23 +74,48 @@
         $('#m').val('');
         return false;
     });
+
+    $('#leave-btn').click(function() {
+        var msgObj = {
+            "username": username,
+            "msg": "",
+            "uuid": randomId,
+            "roomId": roomId,
+            "type": "leave",
+        };
+        console.log(msgObj);
+        socket.emit('chat message', JSON.stringify(msgObj));
+    });
+
+
     socket.on('chat message', function(msg){
-        var currentdate = new Date();
-        var time = currentdate.getHours() + ":" + ((currentdate.getMinutes() < 10)?"0":"") + currentdate.getMinutes();
 
         var revObj = JSON.parse(msg);
+        console.log(revObj);
 
-        if (nowMessage == revObj.uuid) {
-            // $('#messages').append($('<li>').text('<span class="mine">'+msg+'</span>'));
-            $('#messages').append('<li>').append($('<span class="mine">').text(revObj.msg));
-            $('#messages').append('<li>').append($('<span class="mine-time">').text(time));
-        } else {
-            $('#messages').append('<li>').append($('<span class="others">').text(revObj.msg));
-            $('#messages').append('<li>').append($('<span class="others-time">').text(time+"("+revObj.username+")"));
+        switch (revObj.type) {
+            case "connect":
+                roomId = revObj.roomId;
+                break;
+            case "message":
+                var currentdate = new Date();
+                var time = currentdate.getHours() + ":" + ((currentdate.getMinutes() < 10)?"0":"") + currentdate.getMinutes();
+
+                if (nowMessage == revObj.uuid) {
+                    // $('#messages').append($('<li>').text('<span class="mine">'+msg+'</span>'));
+                    $('#messages').append('<li>').append($('<span class="mine">').text(revObj.msg));
+                    $('#messages').append('<li>').append($('<span class="mine-time">').text(time));
+                } else {
+                    $('#messages').append('<li>').append($('<span class="others">').text(revObj.msg));
+                    $('#messages').append('<li>').append($('<span class="others-time">').text(time+"("+revObj.username+")"));
+                }
+
+                $('html,body').scrollTop(100000000000000000);
+                nowMessage = '';
+                break;
+            default:
+                break;
         }
-
-        $('html,body').scrollTop(100000000000000000);
-        nowMessage = ''
     });
 </script>
 </body>
